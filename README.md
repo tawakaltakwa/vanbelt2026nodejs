@@ -113,3 +113,6 @@ npm ci --only=production
 * Melihat log real-time aplikasi: `pm2 logs vanbelt-app`
 * Menghentikan aplikasi: `pm2 stop vanbelt-app`
 * Memulai kembali aplikasi: `pm2 restart vanbelt-app`
+
+## Client Android
+[Vanbelt Android](https://github.com/tawakaltakwa/vanbelt2026)
