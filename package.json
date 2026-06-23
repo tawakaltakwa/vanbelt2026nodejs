@@ -1,0 +1,24 @@
+{
+  "name": "vanbelt2026",
+  "version": "1.0.0",
+  "description": "Tabel Aturan Harga Vanbelt",
+  "license": "ISC",
+  "author": "Tawakal Takwa",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1"
+  },
+  "allowScripts": {
+    "sqlite3@6.0.1": true,
+    "sqlite@5.1.1": true
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

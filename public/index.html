@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Aturan Harga Vanbelt V2</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <h1>Aplikasi Vanbelt</h1>
+    <div class="kotak-tengah" style="justify-content: center;vertical-align: middle;">
+        Pilih Jenis Vanbelt : <div id="daftarJenis"></div>
+    </div>
+    <br>
+    <div class="kotak-tengah sembunyikan" id="kotakDetailVanbelt">
+        <div class="kotak-floatkiri">
+            <h3 id="judulInput">Detail</h3>
+            <table>
+                <tr>
+                    <td>Jenis</td>
+                    <td id="t_jenis">-</td>
+                </tr>
+                <tr>
+                    <td>Dasar Harga</td>
+                    <td id="t_dasar_harga">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Status</td>
+                    <td id="t_borongan_status">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Batas (<=) </td>
+                    <td id="t_borongan_batas">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Harga</td>
+                    <td id="t_borongan_harga">-</td>
+                </tr>
+            </table>
+            <button onclick="bukaEdit()" class="btnumum">Edit</button>
+        </div>
+        <div class="kotak-floatkiri sembunyikan" id="kotakEditData">
+            <h3 id="judulEditData">Edit Data</h3>
+            <table>
+                <tr>
+                    <td>Dasar Harga</td>
+                    <td><input type="number" id="e_dasar_harga" placeholder="Dasar Harga"></td>
+                </tr>
+                <tr>
+                    <td>Borongan Status</td>
+                    <td><select id="e_borongan_status">
+                            <option value="ada">Ada</option>
+                            <option value="tidakada">Tidak Ada</option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td>Borongan Batas (<=) </td>
+                    <td><input type="number" id="e_borongan_batas" placeholder="Borongan Batas"></td>
+                </tr>
+                <tr>
+                    <td>Borongan Harga</td>
+                    <td><input type="number" id="e_borongan_harga" placeholder="Borongan Harga"></td>
+                </tr>
+            </table>
+            <button onclick="updateVanbelt()" class="btnyes">Update</button>
+            <button onclick="batalEdit()" class="btnno">Batal</button>
+        </div>
+        <div class="kotak-floatkiri">
+            <h3 id="judulKotakHitung">Hitung Harga Vanbelt</h3>
+            <table>
+                <tr>
+                    <td>Ukuran</td>
+                    <td><input type="number" id="i_ukuran" placeholder="Ukuran" onkeyup="hitungHarga()"
+                            onchange="hitungHarga()"></td>
+                </tr>
+                <tr>
+                    <td>Harga</td>
+                    <td id="o_harga">0</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        // const API_URL = "/api/vanbelt"
+        let vanbeltList = []
+        let vanbeltDipilih = null
+
+        async function muatData() {
+            const respon = await fetch('/api/vanbelt/ambilsemua');
+            const data = await respon.json();
+            vanbeltList = data;
+            const daftarJenis = document.getElementById('daftarJenis');
+            daftarJenis.innerHTML = '';
+
+            if (data.length === 0) {
+                daftarJenis.innerHTML = `Tidak ada data`;
+                return;
+            }
+
+            data.forEach(vanbelt => {
+                daftarJenis.innerHTML += `
+                    <button id="btn-${vanbelt.jenis}" class="btnumum" onclick="pilihJenis('${vanbelt.jenis}')">${vanbelt.jenis}</button>
+                `;
+            });
+        }
+
+        async function pilihJenis(jenis) {
+            try {
+                if (vanbeltDipilih) {
+                    document.getElementById(`btn-${vanbeltDipilih.jenis}`).classList.remove('btnumumnyala');
+                    document.getElementById(`btn-${vanbeltDipilih.jenis}`).classList.add('btnumum');
+                }
+                const respon = await fetch(`/api/vanbelt/ambilsatu/${jenis}`);
+                if (!respon.ok) throw new Error("Gagal mengambil data");
+
+                const data = await respon.json();
+                vanbeltDipilih = data;
+                document.getElementById('kotakDetailVanbelt').classList.remove('sembunyikan');
+                document.getElementById('judulInput').innerText = `Detail ${data.jenis}`;
+                document.getElementById('t_jenis').textContent = data.jenis;
+                document.getElementById('t_dasar_harga').textContent = data.dasar_harga;
+                document.getElementById('t_borongan_status').textContent = data.borongan_status;
+                document.getElementById('t_borongan_batas').textContent = data.borongan_batas;
+                document.getElementById('t_borongan_harga').textContent = data.borongan_harga;
+                document.getElementById('i_ukuran').value = ''
+                document.getElementById('o_harga').textContent = '0'
+                document.getElementById(`btn-${jenis}`).classList.remove('btnumum')
+                document.getElementById(`btn-${jenis}`).classList.add('btnumumnyala')
+            } catch (error) {
+                console.error("Error saat mengambil data:", error);
+            }
+        }
+
+        function hitungHarga() {
+            const ukuran = parseInt(document.getElementById('i_ukuran').value);
+            let harga = 0
+            if (!ukuran) {
+                document.getElementById('o_harga').textContent = "0";
+            } else {
+                if (vanbeltDipilih.borongan_status === "ada" && ukuran <= vanbeltDipilih.borongan_batas) {
+                    harga = vanbeltDipilih.borongan_harga;
+                } else {
+                    harga = vanbeltDipilih.dasar_harga * ukuran;
+                }
+                const hargaBulat = Math.ceil(harga / 1000) * 1000;
+                document.getElementById('o_harga').textContent = hargaBulat;
+            }
+        }
+
+        function bukaEdit() {
+            document.getElementById('judulEditData').innerText = `Edit ${vanbeltDipilih.jenis}`;
+            document.getElementById('kotakEditData').classList.remove('sembunyikan');
+            document.getElementById('e_dasar_harga').value = vanbeltDipilih.dasar_harga;
+            document.getElementById('e_borongan_status').value = vanbeltDipilih.borongan_status;
+            document.getElementById('e_borongan_batas').value = vanbeltDipilih.borongan_batas;
+            document.getElementById('e_borongan_harga').value = vanbeltDipilih.borongan_harga;
+        }
+
+        function batalEdit() {
+            document.getElementById('e_dasar_harga').value = ''
+            document.getElementById('e_borongan_status').value = ''
+            document.getElementById('e_borongan_batas').value = ''
+            document.getElementById('e_borongan_harga').value = ''
+            document.getElementById('kotakEditData').classList.add('sembunyikan');
+        }
+
+        async function updateVanbelt() {
+            try {
+                const respon = await fetch(`/api/vanbelt/update/${vanbeltDipilih.jenis}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dasar_harga: parseInt(document.getElementById('e_dasar_harga').value),
+                        borongan_status: document.getElementById('e_borongan_status').value,
+                        borongan_batas: parseInt(document.getElementById('e_borongan_batas').value),
+                        borongan_harga: parseInt(document.getElementById('e_borongan_harga').value),
+                    }),
+                });
+                if (!respon.ok) throw new Error("Gagal memperbarui data");
+
+                const data = await respon.json();
+                console.log(data.message);
+                document.getElementById('i_ukuran').value = ''
+                document.getElementById('o_harga').textContent = '0'
+                batalEdit();
+                muatData();
+                pilihJenis(vanbeltDipilih.jenis)
+            } catch (error) {
+                console.error("Error saat memperbarui data:", error);
+            }
+        }
+
+        muatData()
+    </script>
+</body>
+
+</html>

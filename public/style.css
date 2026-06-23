@@ -1,0 +1,67 @@
+* {
+    text-align: center;
+    justify-content: center;
+}
+
+table {
+    margin: auto;
+}
+
+thead th {
+    background-color: #000;
+    color: #fff;
+}
+
+th,
+td {
+    padding: 10px;
+}
+
+td,
+input {
+    text-align: left;
+}
+
+.kotak-tengah {
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}
+
+.kotak-floatkiri {
+    border: 2px solid #000;
+    border-radius: 15px;
+    padding: 10px;
+    position: relative;
+    height: fit-content;
+    margin: 10px;
+}
+
+.btnyes {
+    background-image: linear-gradient(155deg, #ddffdd, #aaddaa);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.btnno {
+    background-image: linear-gradient(155deg, #ff8888, #ddaaaa);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.btnumum {
+    background-image: linear-gradient(155deg, #ddeeff, #aaddee);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.btnumumnyala {
+    background-image: linear-gradient(155deg, #aaaaff, #8888ff);
+    padding: 5px;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sembunyikan {
+    display: none;
+}

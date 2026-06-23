@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Aturan Harga Vanbelt</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <h2>Vanbelt</h2>
+    <div class="kotak-tengah">
+        <div class="kotak-floatkiri">
+            <h3>Tabel Aturan Harga</h3>
+            <table border="1" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Jenis</th>
+                        <th>Dasar Harga</th>
+                        <th>Borongan Status</th>
+                        <th>Borongan Batas (&lt;=)</th>
+                        <th>Borongan Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="vanbeltTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="kotak-tengah">
+        <div class="kotak-floatkiri">
+            <h3 id="judulInput">Aturan Baru</h3>
+            <table>
+                <tr>
+                    <td>Jenis</td>
+                    <td id="t_jenis">-</td>
+                </tr>
+                <tr>
+                    <td>Dasar Harga</td>
+                    <td id="t_dasar_harga">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Status</td>
+                    <td id="t_borongan_status">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Batas (<=) </td>
+                    <td id="t_borongan_batas">-</td>
+                </tr>
+                <tr>
+                    <td>Borongan Harga</td>
+                    <td id="t_borongan_harga">-</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API_URL = '/api/vanbelt';
+        let vanbeltList = []
+
+        async function muatData() {
+            const respon = await fetch(API_URL);
+            const data = await respon.json();
+            vanbeltList = data;
+            const tbody = document.getElementById('vanbeltTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4">Belum ada data.</td></tr>`;
+                return;
+            }
+
+            data.forEach(vanbelt => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td onclick="pilihJenis('${vanbelt.jenis}')">${vanbelt.jenis}</td>
+                        <td>${vanbelt.dasar_harga}</td>
+                        <td>${vanbelt.borongan_status}</td>
+                        <td>${vanbelt.borongan_batas}</td>
+                        <td>${vanbelt.borongan_harga}</td>
+                        <td>
+                            <button onclick="siapkanEdit(${vanbelt.id})" class="btnyes">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function pilihJenis(jenis) {
+            try {
+                // 1. Panggil endpoint [READROW] ke backend
+                const respon = await fetch(`/api/vanbelt/${jenis}`);
+                if (!respon.ok) throw new Error("Gagal mengambil data");
+
+                const data = await respon.json();
+
+                // 2. Tampilkan judul
+                document.getElementById('judulInput').innerText = `Detail ${data.jenis}`;
+
+                // 3. Masukkan data ke HTML menggunakan .textContent (bukan .value)
+                document.getElementById('t_jenis').textContent = data.jenis;
+                document.getElementById('t_dasar_harga').textContent = data.dasar_harga;
+                document.getElementById('t_borongan_status').textContent = data.borongan_status;
+                document.getElementById('t_borongan_batas').textContent = data.borongan_batas;
+                document.getElementById('t_borongan_harga').textContent = data.borongan_harga;
+
+            } catch (error) {
+                console.error("Error saat mengambil data:", error);
+            }
+        }
+
+
+        muatData();
+    </script>
+</body>
+
+</html>
