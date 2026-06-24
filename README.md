@@ -71,6 +71,14 @@ npm install
 ```
 Perintah ini akan mendownload semua package yang terdaftar di `package.json` dan mengompilasi ulang module native (seperti `sqlite3`) agar sesuai dengan sistem operasi target.
 
+* dibuat di archlinux, saya coba di ubuntu malah error
+jadi coba ini:
+```bash
+rm -rf node_modules package-lock.json
+apt update && apt install -y build-essential python3
+npm install --build-from-source
+```
+
 *Catatan untuk Production di VPS:*
 Anda bisa menggunakan perintah di bawah ini agar proses instalasi lebih cepat dan bersih:
 ```bash
